@@ -16,18 +16,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Clean old containers
+        run: docker compose down || true
+
       - name: Build Docker image
-        run: docker compose build
+        run: docker compose build --no-cache
 
       - name: Start container
         run: docker compose up -d
 
-      - name: Show running containers
+      - name: Show containers
         run: docker ps -a
 
-      - name: Wait for app
+      - name: Show logs
         run: |
-          sleep 15
+          sleep 10
           docker logs data-processing-api || true
 
       - name: Test health endpoint
