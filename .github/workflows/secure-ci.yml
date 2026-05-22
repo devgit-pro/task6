@@ -9,7 +9,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  build-test:
+  build-test-scan:
     runs-on: self-hosted
 
     steps:
@@ -21,6 +21,15 @@ jobs:
 
       - name: Build Docker image
         run: docker compose build --no-cache
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: cyberdyne/data-processing-api:secure
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: 0
 
       - name: Start container
         run: docker compose up -d
