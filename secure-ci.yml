@@ -1,0 +1,34 @@
+name: Secure CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t cyberdyne/data-processing-api:secure .
+
+      - name: Start app
+        run: docker compose up -d
+
+      - name: Test health endpoint
+        run: curl --fail http://127.0.0.1:5000/health
+
+      - name: Test process endpoint
+        run: |
+          curl --fail -X POST http://127.0.0.1:5000/process \
+          -H "Content-Type: application/json" \
+          -d '{"shipment_id":"SHP001","destination":"Colombo","status":"pending"}'
+
+      - name: Stop app
+        if: always()
+        run: docker compose down

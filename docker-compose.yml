@@ -1,0 +1,20 @@
+services:
+  web-api:
+    build: .
+    image: cyberdyne/data-processing-api:secure
+    container_name: data-processing-api
+    ports:
+      - "127.0.0.1:5000:5000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "-m", "urllib.request", "http://127.0.0.1:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
